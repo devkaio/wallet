@@ -1,0 +1,14 @@
+{
+  "alreadyHaveAccount": "Já possui uma conta?",
+  "confirmPassword": "Confirmar senha",
+  "createAccount": "criar conta",
+  "createAccountAndStartTransferring": "Crie uma conta e comece a transferir",
+  "createNewAccount": "Criar nova conta",
+  "email": "Email",
+  "forgotPassword": "Esqueceu a senha?",
+  "helloWorld": "Olá Mundo!",
+  "login": "entrar",
+  "loginAndStartTransferring": "Faça login e comece a transferir",
+  "name": "Nome",
+  "password": "Senha"
+}
