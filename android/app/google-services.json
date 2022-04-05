@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "249508352854",
+    "project_id": "wallet-a72b4",
+    "storage_bucket": "wallet-a72b4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:249508352854:android:a6536c0b2f7515158a3cf7",
+        "android_client_info": {
+          "package_name": "dev.kaio.wallet.wallet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "249508352854-9aecqj9csfque01dt9n4e1shc1aqgb20.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdqtxt_2CS7z9oaxagdV-nmujVIQ5l6sk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "249508352854-9aecqj9csfque01dt9n4e1shc1aqgb20.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
