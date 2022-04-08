@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mobx/mobx.dart';
 import 'package:wallet/app_controller.dart';
+import 'package:wallet/l10n/i18n.dart';
 import 'package:wallet/modules/home/features/start/start_store.dart';
 
 import '../../../../shared/utils/failure.dart';
@@ -63,7 +64,7 @@ class _StartPageState extends ModularState<StartPage, StartStore> {
                   _appController.firebase.signOut();
                   Modular.to.popUntil(ModalRoute.withName('/initial/'));
                 },
-                child: const Text('Logout')),
+                child: Text(I18n.of(context)?.logout ?? 'Logout')),
           ],
         ),
       ),

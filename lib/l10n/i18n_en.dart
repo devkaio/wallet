@@ -32,10 +32,16 @@ class I18nEn extends I18n {
   String get helloWorld => 'Hello World!';
 
   @override
+  String get initializing => 'Initializing...';
+
+  @override
   String get login => 'login';
 
   @override
   String get loginAndStartTransferring => 'Login and start transferring';
+
+  @override
+  String get logout => 'Logout';
 
   @override
   String get name => 'Name';

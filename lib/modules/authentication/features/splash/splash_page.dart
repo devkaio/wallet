@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mobx/mobx.dart';
+import 'package:wallet/l10n/i18n.dart';
 import 'package:wallet/modules/authentication/features/splash/splash_state.dart';
 import 'package:wallet/modules/authentication/features/splash/splash_store.dart';
 
@@ -52,10 +53,10 @@ class _SplashPageState extends ModularState<SplashPage, SplashStore> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text('Initializing'),
-            SizedBox(height: 16.0),
-            CircularProgressIndicator(),
+          children: [
+            Text(I18n.of(context)?.initializing ?? 'Initializing'),
+            const SizedBox(height: 16.0),
+            const CircularProgressIndicator(),
           ],
         ),
       ),

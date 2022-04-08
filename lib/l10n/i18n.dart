@@ -144,6 +144,12 @@ abstract class I18n {
   /// **'Hello World!'**
   String get helloWorld;
 
+  /// No description provided for @initializing.
+  ///
+  /// In en, this message translates to:
+  /// **'Initializing...'**
+  String get initializing;
+
   /// No description provided for @login.
   ///
   /// In en, this message translates to:
@@ -155,6 +161,12 @@ abstract class I18n {
   /// In en, this message translates to:
   /// **'Login and start transferring'**
   String get loginAndStartTransferring;
+
+  /// No description provided for @logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logout;
 
   /// No description provided for @name.
   ///

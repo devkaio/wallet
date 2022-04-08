@@ -32,10 +32,16 @@ class I18nEs extends I18n {
   String get helloWorld => '!Ola Mondo!';
 
   @override
+  String get initializing => 'Iniciando...';
+
+  @override
   String get login => 'entra';
 
   @override
   String get loginAndStartTransferring => 'Inicia sesión y comienza a transferir';
+
+  @override
+  String get logout => 'Salir';
 
   @override
   String get name => 'Nombre';

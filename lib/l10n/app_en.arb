@@ -7,8 +7,10 @@
   "email": "Email",
   "forgotPassword": "Forgot password?",
   "helloWorld": "Hello World!",
+  "initializing": "Initializing...",
   "login": "login",
   "loginAndStartTransferring": "Login and start transferring",
+  "logout": "Logout",
   "name": "Name",
   "password": "Password"
 }

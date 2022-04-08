@@ -32,10 +32,16 @@ class I18nPt extends I18n {
   String get helloWorld => 'Olá Mundo!';
 
   @override
+  String get initializing => 'Inicializando...';
+
+  @override
   String get login => 'entrar';
 
   @override
   String get loginAndStartTransferring => 'Faça login e comece a transferir';
+
+  @override
+  String get logout => 'Sair';
 
   @override
   String get name => 'Nome';
