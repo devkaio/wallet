@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:mobx/mobx.dart';
 import 'package:wallet/l10n/i18n.dart';
 import 'package:wallet/modules/authentication/features/login/login_store.dart';
@@ -24,6 +25,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends ModularState<LoginPage, LoginStore> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final LocalAuthentication _auth = LocalAuthentication();
 
   ReactionDisposer? _disposer;
   @override
@@ -36,7 +38,6 @@ class _LoginPageState extends ModularState<LoginPage, LoginStore> {
           builder: (_) => const Center(child: CircularProgressIndicator()),
         ),
         failure: () {
-          Navigator.pop(context);
           final Failure? error = (s as LoginStateFailure).error;
           showDialog(
             context: context,
@@ -58,9 +59,13 @@ class _LoginPageState extends ModularState<LoginPage, LoginStore> {
             arguments: store.userCredential,
           );
         },
+        empty: () {
+          store.authenticateWithBiometrics(auth: _auth);
+        },
         orElse: () {},
       );
     });
+    Future.delayed(const Duration(seconds: 1), () => store.checkBiometrics());
     super.initState();
   }
 

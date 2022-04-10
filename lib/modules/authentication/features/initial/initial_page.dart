@@ -1,14 +1,10 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mobx/mobx.dart';
 import 'package:wallet/l10n/i18n.dart';
 import 'package:wallet/modules/authentication/features/initial/initial_store.dart';
-import 'package:wallet/shared/constants/app_colors.dart';
-import 'package:wallet/shared/constants/app_text_style.dart';
-import 'package:wallet/shared/widgets/custom_text_button.dart';
-import 'package:wallet/shared/widgets/primary_button.dart';
+import 'package:wallet/shared/constants/constants.dart';
+import 'package:wallet/shared/widgets/widgets.dart';
 
 import 'initial_state.dart';
 
@@ -30,17 +26,12 @@ class _InitialPageState extends ModularState<InitialPage, InitialStore> {
           barrierDismissible: false,
           builder: (_) => const Center(child: CircularProgressIndicator()),
         ),
-        failure: () {
-          Modular.to.pushNamed('/login');
-        },
-        success: () {
-          Modular.to.pushNamed(
-            '/home/',
-          );
-        },
+        failure: () {},
+        success: () {},
         orElse: () {},
       );
     });
+
     super.initState();
   }
 
@@ -65,23 +56,7 @@ class _InitialPageState extends ModularState<InitialPage, InitialStore> {
               children: [
                 Column(
                   children: [
-                    Container(
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.all(Radius.circular(16.0)),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Transform.rotate(
-                          angle: -math.pi / 2,
-                          child: const Icon(
-                            Icons.send_rounded,
-                            color: AppColors.white,
-                            size: 45.0,
-                          ),
-                        ),
-                      ),
-                    ),
+                    const AppLogo(),
                     const SizedBox(height: 8.0),
                     Text(
                       'WALLET',

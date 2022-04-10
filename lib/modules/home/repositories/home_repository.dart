@@ -6,4 +6,6 @@ abstract class HomeRepository {
   Future<Either<Failure, Success<bool>>> getUserData();
 
   Future<Either<Failure, Success<String>>> getToken();
+
+  Future<Either<Failure, Success<bool>>> signOut();
 }

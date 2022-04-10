@@ -24,6 +24,23 @@ mixin _$StartStore on _StartStoreBase, Store {
     });
   }
 
+  final _$isBiometricsAvaliableAtom =
+      Atom(name: '_StartStoreBase.isBiometricsAvaliable');
+
+  @override
+  bool get isBiometricsAvaliable {
+    _$isBiometricsAvaliableAtom.reportRead();
+    return super.isBiometricsAvaliable;
+  }
+
+  @override
+  set isBiometricsAvaliable(bool value) {
+    _$isBiometricsAvaliableAtom.reportWrite(value, super.isBiometricsAvaliable,
+        () {
+      super.isBiometricsAvaliable = value;
+    });
+  }
+
   final _$_StartStoreBaseActionController =
       ActionController(name: '_StartStoreBase');
 
@@ -41,7 +58,8 @@ mixin _$StartStore on _StartStoreBase, Store {
   @override
   String toString() {
     return '''
-state: ${state}
+state: ${state},
+isBiometricsAvaliable: ${isBiometricsAvaliable}
     ''';
   }
 }

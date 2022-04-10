@@ -30,4 +30,19 @@ class HomeRepositoryImpl implements HomeRepository {
           exception: e, message: 'erro id token', status: 0, type: 'error'));
     }
   }
+
+  @override
+  Future<Either<Failure, Success<bool>>> signOut() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      return Right(Success(true));
+    } on FirebaseAuthException catch (e) {
+      return Left(Failure(
+        status: 0,
+        message: e.message ?? 'erro',
+        type: 'sign_out_error',
+        exception: e,
+      ));
+    }
+  }
 }
