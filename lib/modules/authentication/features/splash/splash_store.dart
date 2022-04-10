@@ -23,8 +23,7 @@ abstract class _SplashStoreBase with Store {
   Future<void> authenticate() async {
     update(SplashStateLoading());
 
-    final response = await Future.delayed(
-        const Duration(seconds: 2), () => repository.authenticate());
+    final response = await repository.authenticate();
 
     response.fold(
       (l) => update(SplashStateFailure(error: l)),

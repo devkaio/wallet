@@ -1,40 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:wallet/modules/authentication/features/login/utils/login_error_messages.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:wallet/modules/authentication/features/login/utils/login_error.dart';
 import 'package:wallet/modules/authentication/repositories/authentication_repository.dart';
 import 'package:wallet/shared/models/user.dart';
 import 'package:wallet/shared/utils/failure.dart';
 import 'package:wallet/shared/utils/success.dart';
 
+import '../../../firebase_options.dart';
+
 class AuthenticationRepositoryImpl implements AuthenticationRepository {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  final CollectionReference _users =
-      FirebaseFirestore.instance.collection('users');
-
   @override
   Future<Either<Failure, Success<bool>>> authenticate() async {
-    final User? _currentUser = _auth.currentUser;
-
     try {
-      if (_currentUser != null) {
-        return Right(Success(true));
-      } else {
-        return Left(
-          Failure(
-            exception: 'Error',
-            message: 'Usuário deslogado.',
-            status: 0,
-            type: 'Error',
-          ),
-        );
-      }
-    } on Exception {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      return Right(Success(true));
+    } on FirebaseException catch (e) {
       return Left(
         Failure(
-          exception: 'Error',
-          message: 'Usuário deslogado.',
+          exception: e,
+          message: e.message ?? 'erro',
           status: 0,
           type: 'Error',
         ),
@@ -48,6 +36,9 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     required String email,
     required String password,
   }) async {
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+    final CollectionReference _users =
+        FirebaseFirestore.instance.collection('users');
     try {
       final UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
@@ -92,6 +83,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         email: email,
         password: password,
       );
+
       if (userCredential.user?.uid != null) {
         return Right(Success(userCredential));
       } else {

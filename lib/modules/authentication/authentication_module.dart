@@ -7,6 +7,7 @@ import 'package:wallet/modules/authentication/features/login/login_page.dart';
 import 'package:wallet/modules/authentication/features/login/login_store.dart';
 import 'package:wallet/modules/authentication/features/splash/splash_store.dart';
 import 'package:wallet/modules/authentication/repositories/authentication_repository_impl.dart';
+import 'package:wallet/shared/services/local_secure_storage/auth_data_storage_impl.dart';
 
 import 'features/splash/splash_page.dart';
 import 'repositories/authentication_repository.dart';
@@ -37,6 +38,7 @@ class AuthenticationModule extends Module {
         Bind.lazySingleton(
           (i) => AuthenticationRepositoryImpl(),
         ),
+        Bind.lazySingleton((i) => AuthDataStorageImpl()),
       ];
   @override
   List<ModularRoute> get routes => [
