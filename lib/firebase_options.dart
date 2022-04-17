@@ -61,7 +61,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '249508352854',
     projectId: 'wallet-a72b4',
     storageBucket: 'wallet-a72b4.appspot.com',
-    iosClientId: '249508352854-juencd2901oqgttghl67k7rr67f79i8n.apps.googleusercontent.com',
+    iosClientId:
+        '249508352854-juencd2901oqgttghl67k7rr67f79i8n.apps.googleusercontent.com',
     iosBundleId: 'dev.kaio.wallet',
   );
 }
