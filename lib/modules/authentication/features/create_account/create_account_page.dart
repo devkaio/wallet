@@ -57,7 +57,9 @@ class _CreateAccountPageState
           );
         },
         success: () {
-          Modular.to.pop();
+          Modular.to.pushReplacementNamed('/home/', arguments: {
+            'userData': store.userData,
+          });
         },
         orElse: () {},
       );
@@ -128,11 +130,6 @@ class _CreateAccountPageState
                     child: Column(
                       children: [
                         CustomTextField(
-                          controller: _nameController,
-                          labelText: I18n.of(context)?.name ?? 'Nome',
-                        ),
-                        const SizedBox(height: 8.0),
-                        CustomTextField(
                           controller: _emailController,
                           labelText: I18n.of(context)?.email ?? 'Email',
                         ),
@@ -140,12 +137,14 @@ class _CreateAccountPageState
                         CustomTextField(
                           controller: _passwordController,
                           labelText: I18n.of(context)?.password ?? 'Senha',
+                          obscureText: true,
                         ),
                         const SizedBox(height: 8.0),
                         CustomTextField(
                           controller: _confirmPasswordController,
                           labelText: I18n.of(context)?.confirmPassword ??
                               'Confirme a senha',
+                          obscureText: true,
                         ),
                         const SizedBox(height: 16.0),
                       ],
@@ -158,7 +157,6 @@ class _CreateAccountPageState
                         PrimaryButton(
                           onPressed: () {
                             store.createAccount(
-                              userName: _nameController.text,
                               email: _emailController.text,
                               password: _passwordController.text,
                             );

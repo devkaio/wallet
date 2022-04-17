@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:mobx/mobx.dart';
 import 'package:wallet/modules/home/repositories/home_repository.dart';
@@ -49,7 +48,7 @@ abstract class _StartStoreBase with Store {
     final String? _checkLocalBiometric =
         await biometricStorage.getBiometrics(biometricsKey: 'biometricsKey');
 
-    if (_checkLocalBiometric == null || _checkLocalBiometric.isEmpty) {
+    if (_checkLocalBiometric == 'false' || _checkLocalBiometric == null) {
       final _isDeviceSupported = await LocalAuthImpl().isDeviceSupported(
         auth: auth,
       );
@@ -69,24 +68,27 @@ abstract class _StartStoreBase with Store {
     required LocalAuthentication auth,
   }) async {
     final result = await LocalAuthImpl().authenticate(auth: auth);
-    final tokenId = await FirebaseAuth.instance.currentUser!.getIdToken();
+    final tokenId =
+        await AuthDataStorageImpl().getTokenId(tokenIdKey: 'tokenIdKey');
+    final refreshToken = await AuthDataStorageImpl()
+        .getRefreshToken(refreshTokenKey: 'refreshTokenKey');
 
     result.fold(
       (l) {
-        biometricStorage.setBiometrics(
-          biometricsKey: 'biometricKey',
-          biometric: false,
-        );
         update(StartStateFailure(error: l));
       },
       (r) async {
         await biometricStorage.setBiometrics(
-          biometricsKey: 'biometricKey',
+          biometricsKey: 'biometricsKey',
           biometric: true,
         );
         await authDataStorage.setTokenId(
           tokenIdKey: 'tokenIdKey',
-          tokenId: tokenId,
+          tokenId: tokenId!,
+        );
+        await AuthDataStorageImpl().setRefreshToken(
+          refreshTokenKey: 'refreshTokenKey',
+          refreshToken: refreshToken!,
         );
 
         update(StartStateSuccess());
@@ -99,7 +101,9 @@ abstract class _StartStoreBase with Store {
 
     result.fold(
       (l) => null,
-      (r) => null,
+      (r) {
+        BiometricStorageImpl().deleteBiometrics();
+      },
     );
   }
 }

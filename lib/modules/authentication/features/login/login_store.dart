@@ -1,12 +1,12 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:mobx/mobx.dart';
+import 'package:wallet/app_controller.dart';
 import 'package:wallet/modules/authentication/repositories/authentication_repository.dart';
-import 'package:wallet/shared/services/local_auth/local_auth_impl.dart';
-import 'package:wallet/shared/services/local_secure_storage/auth_data_storage_impl.dart';
-import 'package:wallet/shared/services/local_secure_storage/biometric_storage_impl.dart';
-import 'package:wallet/shared/utils/failure.dart';
 
+import '../../../../shared/models/models.dart';
+import '../../../../shared/services/services.dart';
+import '../../../../shared/utils/utils.dart';
 import 'login_state.dart';
 
 part 'login_store.g.dart';
@@ -19,7 +19,11 @@ abstract class _LoginStoreBase with Store {
     required this.repository,
   });
 
-  UserCredential? userCredential;
+  AuthData? authData;
+
+  TokenData? tokenData;
+
+  UserData? userData;
 
   @observable
   LoginState state = LoginStateEmpty();
@@ -34,30 +38,50 @@ abstract class _LoginStoreBase with Store {
     required String password,
   }) async {
     update(LoginStateLoading());
-    final result = await repository.login(
-      email: email,
-      password: password,
-    );
 
-    result.fold(
-      (l) => update(LoginStateFailure(error: l)),
-      (r) async {
-        userCredential = r.data;
+    final localTokenId =
+        await AuthDataStorageImpl().getTokenId(tokenIdKey: 'tokenIdKey');
+    try {
+      final result = await repository.login(
+        email: email,
+        password: password,
+      );
 
-        final String? idToken = await r.data.user?.getIdToken();
+      result.fold(
+        (l) => throw l,
+        (r) async {
+          Modular.get<AppController>().authData = r.data;
+          final tokenId = r.data.idToken;
 
-        await BiometricStorageImpl().setBiometrics(
-          biometricsKey: 'biometricsKey',
-          biometric: true,
-        );
+          if (localTokenId != null && localTokenId == tokenId) {
+            await getUserData();
+            update(LoginStateSuccess());
+          } else {
+            BiometricStorageImpl().deleteBiometrics();
+            AuthDataStorageImpl().deleteUserData();
 
-        await AuthDataStorageImpl().setTokenId(
-          tokenIdKey: 'tokenIdKey',
-          tokenId: idToken!,
-        );
-        update(LoginStateSuccess());
-      },
-    );
+            await AuthDataStorageImpl().setTokenId(
+              tokenIdKey: 'tokenIdKey',
+              tokenId: r.data.idToken!,
+            );
+            await AuthDataStorageImpl().setRefreshToken(
+              refreshTokenKey: 'refreshTokenKey',
+              refreshToken: r.data.refreshToken!,
+            );
+            await getUserData();
+            update(LoginStateSuccess());
+          }
+        },
+      );
+    } on Failure catch (e) {
+      update(LoginStateFailure(
+          error: Failure(
+        status: e.status,
+        message: e.message,
+        type: e.type,
+        exception: e.exception,
+      )));
+    }
   }
 
   Future<void> checkBiometrics() async {
@@ -68,48 +92,85 @@ abstract class _LoginStoreBase with Store {
     final String? checkTokenId =
         await AuthDataStorageImpl().getTokenId(tokenIdKey: 'tokenIdKey');
 
-    try {
-      if (checkBiometrics != null &&
-          checkBiometrics.isNotEmpty &&
-          checkTokenId != null &&
-          checkTokenId.isNotEmpty) {
-        update(LoginStateEmpty());
-      } else {
-        throw Exception();
-      }
-    } on Exception {
-      update(LoginStateFailure(
-          error: Failure(
-        status: 0,
-        message: 'sessao expirada',
-        type: 'session',
-        exception: 'exception',
-      )));
+    final String? checkRefreshToken = await AuthDataStorageImpl()
+        .getRefreshToken(refreshTokenKey: 'refreshTokenKey');
+
+    if (checkBiometrics != null &&
+        checkBiometrics.isNotEmpty &&
+        checkTokenId != null &&
+        checkTokenId.isNotEmpty &&
+        checkRefreshToken != null &&
+        checkRefreshToken.isNotEmpty) {
+      update(LoginStateBiometrics());
     }
   }
 
-  Future<void> authenticateWithBiometrics({
+  Future<void> loginWithBiometrics({
     required LocalAuthentication auth,
   }) async {
-    final tokenId = await FirebaseAuth.instance.currentUser?.getIdToken();
+    final localRefreshToken = await AuthDataStorageImpl()
+        .getRefreshToken(refreshTokenKey: 'refreshTokenKey');
+
+    final checkBiometricPermission = await BiometricStorageImpl()
+        .getBiometrics(biometricsKey: 'biometricsKey');
+
+    if (checkBiometricPermission == 'true') {
+      await updateToken();
+
+      final newRefreshToken = tokenData!.refreshToken;
+
+      if (newRefreshToken == localRefreshToken) {
+        final result = await LocalAuthImpl().authenticate(auth: auth);
+
+        result.fold(
+          (l) => null,
+          (r) async {
+            update(LoginStateLoading());
+            await getUserData();
+            update(LoginStateSuccess());
+          },
+        );
+      }
+    }
+  }
+
+  Future<void> updateToken() async {
+    update(LoginStateLoading());
+    final localRefreshToken = await AuthDataStorageImpl()
+        .getRefreshToken(refreshTokenKey: 'refreshTokenKey');
+
+    final result = await repository.updateToken(
+      refreshToken: localRefreshToken!,
+    );
+
+    result.fold(
+      (l) {
+        BiometricStorageImpl().deleteBiometrics();
+        AuthDataStorageImpl().deleteUserData();
+        update(LoginStateFailure(error: l));
+      },
+      (r) {
+        tokenData = r.data;
+        update(LoginStateEmpty());
+      },
+    );
+  }
+
+  Future<void> getUserData() async {
     final localTokenId =
         await AuthDataStorageImpl().getTokenId(tokenIdKey: 'tokenIdKey');
 
-    if (tokenId == localTokenId) {
-      final result = await LocalAuthImpl().authenticate(auth: auth);
+    final result = await repository.getUserData(
+      idToken: localTokenId!,
+    );
 
-      result.fold(
-        (l) => null,
-        (r) => update(LoginStateSuccess()),
-      );
-    } else {
-      update(LoginStateFailure(
-          error: Failure(
-        status: 0,
-        message: 'sessão expirad',
-        type: 'expired',
-        exception: 'exception',
-      )));
-    }
+    result.fold(
+      (l) {
+        return Future.error(l);
+      },
+      (r) {
+        userData = r.data;
+      },
+    );
   }
 }

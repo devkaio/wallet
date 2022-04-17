@@ -26,7 +26,9 @@ class HomeModule extends Module {
   List<ModularRoute> get routes => [
         ChildRoute(
           '/',
-          child: (context, args) => const StartPage(),
+          child: (context, args) => StartPage(
+            userData: args.data['userData'],
+          ),
         ),
       ];
 }
