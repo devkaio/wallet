@@ -6,5 +6,5 @@ abstract class BiometricsStorage {
   Future<String?> getBiometrics({
     required String biometricsKey,
   });
-  Future<void> deleteBiometrics();
+  void deleteBiometrics();
 }

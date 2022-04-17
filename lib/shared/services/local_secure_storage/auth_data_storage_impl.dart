@@ -3,9 +3,9 @@ import 'package:wallet/shared/services/local_secure_storage/auth_data_storage.da
 
 class AuthDataStorageImpl implements AuthDataStorage {
   @override
-  Future<void> deleteUserData() async {
+  void deleteUserData() {
     const _storage = FlutterSecureStorage();
-    await _storage.deleteAll();
+    _storage.deleteAll();
   }
 
   @override
@@ -24,6 +24,27 @@ class AuthDataStorageImpl implements AuthDataStorage {
     _storage.write(
       key: tokenIdKey,
       value: tokenId,
+    );
+  }
+
+  @override
+  Future<String?> getRefreshToken({
+    required String refreshTokenKey,
+  }) async {
+    const _storage = FlutterSecureStorage();
+    final result = await _storage.read(key: refreshTokenKey);
+    return result;
+  }
+
+  @override
+  Future<void> setRefreshToken({
+    required String refreshTokenKey,
+    required String refreshToken,
+  }) async {
+    const _storage = FlutterSecureStorage();
+    _storage.write(
+      key: refreshTokenKey,
+      value: refreshToken,
     );
   }
 }

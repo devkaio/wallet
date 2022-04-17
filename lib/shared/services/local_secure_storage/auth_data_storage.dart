@@ -1,4 +1,8 @@
 abstract class AuthDataStorage {
+  Future<void> setRefreshToken({
+    required String refreshTokenKey,
+    required String refreshToken,
+  });
   Future<void> setTokenId({
     required String tokenIdKey,
     required String tokenId,
@@ -6,5 +10,8 @@ abstract class AuthDataStorage {
   Future<String?> getTokenId({
     required String tokenIdKey,
   });
-  Future<void> deleteUserData();
+  Future<String?> getRefreshToken({
+    required String refreshTokenKey,
+  });
+  void deleteUserData();
 }
