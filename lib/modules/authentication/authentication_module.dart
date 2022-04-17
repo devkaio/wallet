@@ -1,4 +1,5 @@
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:wallet/app_controller.dart';
 import 'package:wallet/modules/authentication/features/create_account/create_account_page.dart';
 import 'package:wallet/modules/authentication/features/create_account/create_account_store.dart';
 import 'package:wallet/modules/authentication/features/initial/initial_page.dart';
@@ -36,7 +37,9 @@ class AuthenticationModule extends Module {
           ),
         ),
         Bind.lazySingleton(
-          (i) => AuthenticationRepositoryImpl(),
+          (i) => AuthenticationRepositoryImpl(
+            httpService: i.get<AppController>().dio,
+          ),
         ),
         Bind.lazySingleton((i) => AuthDataStorageImpl()),
       ];

@@ -1,16 +1,21 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:wallet/modules/authentication/features/login/utils/login_error.dart';
-import 'package:wallet/modules/authentication/repositories/authentication_repository.dart';
-import 'package:wallet/shared/models/user.dart';
-import 'package:wallet/shared/utils/failure.dart';
-import 'package:wallet/shared/utils/success.dart';
+import 'package:wallet/shared/models/firebase_error.dart';
 
 import '../../../firebase_options.dart';
+import '../../../shared/models/models.dart';
+import '../../../shared/services/services.dart';
+import '../../../shared/utils/utils.dart';
+import 'authentication_repository.dart';
 
 class AuthenticationRepositoryImpl implements AuthenticationRepository {
+  final HttpService httpService;
+  AuthenticationRepositoryImpl({
+    required this.httpService,
+  });
+
   @override
   Future<Either<Failure, Success<bool>>> authenticate() async {
     try {
@@ -18,11 +23,11 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         options: DefaultFirebaseOptions.currentPlatform,
       );
       return Right(Success(true));
-    } on FirebaseException catch (e) {
+    } on DioError catch (e) {
       return Left(
         Failure(
           exception: e,
-          message: e.message ?? 'erro',
+          message: e.message,
           status: 0,
           type: 'Error',
         ),
@@ -31,29 +36,22 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   }
 
   @override
-  Future<Either<Failure, Success<bool>>> createAccount({
-    required String userName,
+  Future<Either<Failure, Success<AuthData>>> createAccount({
     required String email,
     required String password,
   }) async {
-    final FirebaseAuth _auth = FirebaseAuth.instance;
-    final CollectionReference _users =
-        FirebaseFirestore.instance.collection('users');
     try {
-      final UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
+      final response = await httpService.post(
+        url: '/accounts:signUp',
+        data: {
+          'email': email,
+          'password': password,
+          'returnSecureToken': true,
+        },
       );
 
-      await _users.doc().set(UserData(
-            name: userName,
-            email: email,
-            userId: userCredential.user?.uid ?? '0',
-          ).toMap());
-
-      if (userCredential.user != null) {
-        return Right(Success(true));
+      if (response.statusCode == 200) {
+        return Right(Success(AuthData.fromMap(response.data)));
       } else {
         return Left(Failure(
           status: 0,
@@ -62,30 +60,35 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
           exception: 'Error',
         ));
       }
-    } on FirebaseException catch (e) {
+    } on DioError catch (e) {
       return Left(Failure(
-        status: 0,
-        message: e.message ?? 'erro',
-        type: e.code,
-        exception: 'Error',
+        status: FirebaseError.fromJson(e.response?.data).error?.code ?? 0,
+        message: LoginError().errorMessage(
+            code: FirebaseError.fromJson(e.response?.data).error?.message ??
+                'erro'),
+        type: runtimeType.toString(),
+        exception: 'create_account_error',
       ));
     }
   }
 
   @override
-  Future<Either<Failure, Success<UserCredential>>> login({
+  Future<Either<Failure, Success<AuthData>>> login({
     required String email,
     required String password,
   }) async {
     try {
-      final UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
+      final response = await httpService.post(
+        url: '/accounts:signInWithPassword',
+        data: {
+          'email': email,
+          'password': password,
+          'returnSecureToken': true,
+        },
       );
 
-      if (userCredential.user?.uid != null) {
-        return Right(Success(userCredential));
+      if (response.statusCode == 200) {
+        return Right(Success(AuthData.fromMap(response.data)));
       } else {
         return Left(Failure(
           exception: 'error',
@@ -94,12 +97,76 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
           type: 'Error',
         ));
       }
-    } on FirebaseAuthException catch (e) {
+    } on DioError catch (e) {
       return Left(Failure(
-        exception: e.code,
-        message: LoginError().errorMessage(code: e.code),
-        status: 0,
-        type: 'login_error',
+        status: FirebaseError.fromJson(e.response?.data).error?.code ?? 0,
+        message: LoginError().errorMessage(
+            code: FirebaseError.fromJson(e.response?.data).error?.message ??
+                'erro'),
+        type: 'runtimeType.toString()',
+        exception: 'login_error',
+      ));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Success<TokenData>>> updateToken({
+    required String refreshToken,
+  }) async {
+    try {
+      final response = await httpService.post(
+        url: '/token',
+        data: {
+          'grant_type': 'refresh_token',
+          'refresh_token': refreshToken,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return Right(Success(TokenData.fromMap(response.data)));
+      } else {
+        return Left(Failure(
+          exception: 'error',
+          message: 'erro ao atualizar token',
+          status: 0,
+          type: 'Error',
+        ));
+      }
+    } on DioError catch (e) {
+      return Left(Failure(
+        status: e.response?.statusCode ?? 0,
+        message: e.response?.statusMessage ?? 'erro',
+        type: runtimeType.toString(),
+        exception: 'update_token_error',
+      ));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Success<UserData>>> getUserData({
+    required String idToken,
+  }) async {
+    try {
+      final response = await httpService.post(
+        url: '/accounts:lookup',
+        data: {'idToken': idToken},
+      );
+      if (response.statusCode == 200) {
+        return Right(Success(UserData.fromMap(response.data)));
+      } else {
+        return Left(Failure(
+          exception: 'error',
+          message: 'erro ao atualizar token',
+          status: 0,
+          type: 'Error',
+        ));
+      }
+    } on DioError catch (e) {
+      return Left(Failure(
+        status: e.response?.statusCode ?? 0,
+        message: e.response?.statusMessage ?? 'erro',
+        type: runtimeType.toString(),
+        exception: 'get_user_info_error',
       ));
     }
   }

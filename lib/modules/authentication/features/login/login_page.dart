@@ -38,6 +38,8 @@ class _LoginPageState extends ModularState<LoginPage, LoginStore> {
           builder: (_) => const Center(child: CircularProgressIndicator()),
         ),
         failure: () {
+          Navigator.pop(context);
+
           final Failure? error = (s as LoginStateFailure).error;
           showDialog(
             context: context,
@@ -56,16 +58,23 @@ class _LoginPageState extends ModularState<LoginPage, LoginStore> {
         success: () {
           Modular.to.pushReplacementNamed(
             '/home/',
-            arguments: store.userCredential,
+            arguments: {
+              'userData': store.userData,
+            },
           );
         },
+        biometrics: () {
+          store.loginWithBiometrics(auth: _auth);
+        },
         empty: () {
-          store.authenticateWithBiometrics(auth: _auth);
+          Navigator.pop(context);
         },
         orElse: () {},
       );
     });
-    Future.delayed(const Duration(seconds: 1), () => store.checkBiometrics());
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      store.checkBiometrics();
+    });
     super.initState();
   }
 

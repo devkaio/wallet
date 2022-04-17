@@ -8,11 +8,11 @@ class LoginError {
   }) {
     if (_locale == 'en') {
       switch (code) {
-        case 'user-not-found':
+        case 'EMAIL_NOT_FOUND':
           return 'User don\'t exist in our database. Try another e-mail or create an account.';
-        case 'wrong-password':
+        case 'INVALID_PASSWORD':
           return 'Incorrect password. Try again.';
-        case 'invalid-email':
+        case 'INVALID_EMAIL':
           return 'Invalid email address. Please provide correct email.';
         case 'too-many-requests':
           return 'We have blocked all requests from this device due to unusual activity. Try again later.';
@@ -21,11 +21,11 @@ class LoginError {
       }
     } else if (_locale == 'es') {
       switch (code) {
-        case 'user-not-found':
+        case 'EMAIL_NOT_FOUND':
           return 'Usuário não encontrado em nossa base de dados. Tente entrar com outro email ou crie uma conta.';
-        case 'wrong-password':
+        case 'INVALID_PASSWORD':
           return 'Senha incorreta. Revise os dados e tente novamente.';
-        case 'invalid-email':
+        case 'INVALID_EMAIL':
           return 'Email inválido. Revise os dados e tente novamente.';
         case 'too-many-requests':
           return 'We have blocked all requests from this device due to unusual activity. Try again later.';
@@ -34,11 +34,11 @@ class LoginError {
       }
     } else {
       switch (code) {
-        case 'user-not-found':
+        case 'EMAIL_NOT_FOUND':
           return 'Usuário não encontrado em nossa base de dados. Tente entrar com outro email ou crie uma conta.';
-        case 'wrong-password':
+        case 'INVALID_PASSWORD':
           return 'Senha incorreta. Revise os dados e tente novamente.';
-        case 'invalid-email':
+        case 'INVALID_EMAIL':
           return 'Email inválido. Revise os dados e tente novamente.';
         case 'too-many-requests':
           return 'Acesso temporariamente bloqueado devido a muitas tentativas. Tente novamente em alguns minutos.';

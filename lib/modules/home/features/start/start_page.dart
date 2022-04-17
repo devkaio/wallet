@@ -2,19 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:mobx/mobx.dart';
-import 'package:wallet/app_controller.dart';
 import 'package:wallet/l10n/i18n.dart';
 import 'package:wallet/modules/home/features/start/start_store.dart';
-import 'package:wallet/shared/services/local_secure_storage/biometric_storage_impl.dart';
-import 'package:wallet/shared/widgets/custom_dialog.dart';
-import 'package:wallet/shared/widgets/primary_button.dart';
 
+import '../../../../shared/models/models.dart';
+import '../../../../shared/services/services.dart';
 import '../../../../shared/utils/failure.dart';
+import '../../../../shared/widgets/widgets.dart';
 import 'start_state.dart';
 
 class StartPage extends StatefulWidget {
+  final UserData userData;
   const StartPage({
     Key? key,
+    required this.userData,
   }) : super(key: key);
 
   @override
@@ -22,7 +23,6 @@ class StartPage extends StatefulWidget {
 }
 
 class _StartPageState extends ModularState<StartPage, StartStore> {
-  final AppController _appController = Modular.get<AppController>();
   final LocalAuthentication _localAuth = LocalAuthentication();
 
   ReactionDisposer? _disposer;
@@ -55,7 +55,7 @@ class _StartPageState extends ModularState<StartPage, StartStore> {
                   PrimaryButton(
                     onPressed: () async {
                       await BiometricStorageImpl().setBiometrics(
-                        biometricsKey: 'biometricKey',
+                        biometricsKey: 'biometricsKey',
                         biometric: false,
                       );
                       Navigator.pop(context);
@@ -99,8 +99,14 @@ class _StartPageState extends ModularState<StartPage, StartStore> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Text(widget.userData.users[0].email as String),
             ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  AuthDataStorageImpl().deleteUserData();
+                  await BiometricStorageImpl().setBiometrics(
+                    biometricsKey: 'biometricsKey',
+                    biometric: false,
+                  );
                   store.signOut();
                   Modular.to.popUntil(ModalRoute.withName('/initial/'));
                 },

@@ -15,12 +15,15 @@ class LoginStateLoading implements LoginState {}
 
 class LoginStateEmpty implements LoginState {}
 
+class LoginStateBiometrics implements LoginState {}
+
 extension LoginStateExt on LoginState {
   when({
     Function? success,
     Function? failure,
     Function? loading,
     Function? empty,
+    Function? biometrics,
     required Function orElse,
   }) {
     switch (runtimeType) {
@@ -43,6 +46,11 @@ extension LoginStateExt on LoginState {
       case LoginStateEmpty:
         {
           if (empty != null) return empty();
+          return orElse();
+        }
+      case LoginStateBiometrics:
+        {
+          if (biometrics != null) return biometrics();
           return orElse();
         }
       default:

@@ -34,9 +34,8 @@ class _SplashPageState extends ModularState<SplashPage, SplashStore> {
           showDialog(
             context: context,
             builder: (context) => CustomDialog(
-              title: 'Erro',
-              content:
-                  'Houve um problema ao iniciar a aplicação. Tente novamente mais tarde.',
+              title: error?.type ?? 'erro',
+              content: error?.message ?? 'message',
               buttons: [
                 PrimaryButton(
                   onPressed: () {
