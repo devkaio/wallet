@@ -1,10 +1,9 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:wallet/shared/services/local_auth/local_auth.dart';
-import 'package:wallet/shared/services/local_auth/utils/local_auth_messages.dart';
-import 'package:wallet/shared/utils/failure.dart';
-import 'package:wallet/shared/utils/success.dart';
+
+import '../../utils/utils.dart';
+import 'local_auth.dart';
 
 class LocalAuthImpl implements LocalAuth {
   @override

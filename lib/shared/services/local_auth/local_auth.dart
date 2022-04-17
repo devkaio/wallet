@@ -1,7 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:wallet/shared/utils/failure.dart';
-import 'package:wallet/shared/utils/success.dart';
+
+import '../../utils/utils.dart';
+
+export 'local_auth_impl.dart';
+export 'utils/local_auth_messages.dart';
 
 abstract class LocalAuth {
   Future<Either<Failure, Success<bool>>> isDeviceSupported({

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:wallet/shared/services/dio/dio_interceptors.dart';
 
 import '../../constants/api_routes.dart';
 import '../http/http_services.dart';
@@ -11,7 +12,7 @@ class CustomDio implements HttpService {
       baseUrl: ApiRoutes.baseUrl,
     );
     var dio = Dio(options);
-    dio.interceptors.addAll([]);
+    dio.interceptors.addAll([TokenInterceptors()]);
     return dio;
   }
 

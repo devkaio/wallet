@@ -3,9 +3,9 @@ import 'package:wallet/shared/services/local_secure_storage/biometrics_storage.d
 
 class BiometricStorageImpl implements BiometricsStorage {
   @override
-  Future<void> deleteBiometrics() async {
+  void deleteBiometrics() {
     const _storage = FlutterSecureStorage();
-    await _storage.deleteAll();
+    _storage.deleteAll();
   }
 
   @override
