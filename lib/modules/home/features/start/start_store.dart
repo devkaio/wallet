@@ -4,6 +4,7 @@ import 'package:wallet/modules/home/repositories/home_repository.dart';
 import 'package:wallet/shared/services/local_auth/local_auth_impl.dart';
 import 'package:wallet/shared/services/local_secure_storage/auth_data_storage_impl.dart';
 import 'package:wallet/shared/services/local_secure_storage/biometric_storage_impl.dart';
+import 'package:wallet/shared/utils/utils.dart';
 
 import 'start_state.dart';
 
@@ -25,11 +26,30 @@ abstract class _StartStoreBase with Store {
   StartState state = StartStateEmpty();
 
   @observable
+  String? appState;
+
+  @observable
   bool isBiometricsAvaliable = false;
 
   @action
   void update(StartState newState) {
     state = newState;
+  }
+
+  @action
+  void checkAppState(
+    String newAppState, {
+    required LocalAuthentication auth,
+  }) async {
+    final result = await LocalAuthImpl().isDeviceSupported(auth: auth);
+    final String? _checkLocalBiometric =
+        await biometricStorage.getBiometrics(biometricsKey: 'biometricsKey');
+
+    if (newAppState == 'resumed' &&
+        result.isRight() &&
+        _checkLocalBiometric == 'false') {
+      update(StartStateEmpty());
+    }
   }
 
   Future<void> getToken() async {
@@ -48,19 +68,23 @@ abstract class _StartStoreBase with Store {
     final String? _checkLocalBiometric =
         await biometricStorage.getBiometrics(biometricsKey: 'biometricsKey');
 
-    if (_checkLocalBiometric == 'false' || _checkLocalBiometric == null) {
-      final _isDeviceSupported = await LocalAuthImpl().isDeviceSupported(
-        auth: auth,
-      );
+    try {
+      if (_checkLocalBiometric == 'false' || _checkLocalBiometric == null) {
+        final _isDeviceSupported = await LocalAuthImpl().isDeviceSupported(
+          auth: auth,
+        );
 
-      _isDeviceSupported.fold(
-        (l) => throw l,
-        (r) {
-          if (r.data) {
-            update(StartStateEmpty());
-          }
-        },
-      );
+        _isDeviceSupported.fold(
+          (l) => throw l,
+          (r) {
+            if (r.data) {
+              update(StartStateEmpty());
+            }
+          },
+        );
+      }
+    } on Failure catch (e) {
+      update(StartStateFailure(error: e));
     }
   }
 

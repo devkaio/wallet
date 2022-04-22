@@ -15,8 +15,11 @@ class StartStateLoading implements StartState {}
 
 class StartStateEmpty implements StartState {}
 
+class StartSessionExpired implements StartState {}
+
 extension StartStateExt on StartState {
   when({
+    Function? sessionExpired,
     Function? success,
     Function? failure,
     Function? loading,
@@ -43,6 +46,11 @@ extension StartStateExt on StartState {
       case StartStateEmpty:
         {
           if (empty != null) return empty();
+          return orElse();
+        }
+      case StartSessionExpired:
+        {
+          if (sessionExpired != null) return sessionExpired();
           return orElse();
         }
       default:

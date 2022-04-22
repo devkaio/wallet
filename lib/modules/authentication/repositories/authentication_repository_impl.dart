@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:wallet/modules/authentication/features/create_account/utils/create_account_error.dart';
 import 'package:wallet/modules/authentication/features/login/utils/login_error.dart';
 import 'package:wallet/shared/models/firebase_error.dart';
 
@@ -26,10 +27,12 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     } on DioError catch (e) {
       return Left(
         Failure(
-          exception: e,
-          message: e.message,
-          status: 0,
-          type: 'Error',
+          status: FirebaseError.fromJson(e.response?.data).error?.code ?? 0,
+          message: LoginError().errorMessage(
+              code: FirebaseError.fromJson(e.response?.data).error?.message ??
+                  'erro'),
+          type: runtimeType.toString(),
+          exception: 'auth_app_error',
         ),
       );
     }
@@ -63,10 +66,10 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     } on DioError catch (e) {
       return Left(Failure(
         status: FirebaseError.fromJson(e.response?.data).error?.code ?? 0,
-        message: LoginError().errorMessage(
+        message: CreateAccountError().errorMessage(
             code: FirebaseError.fromJson(e.response?.data).error?.message ??
                 'erro'),
-        type: runtimeType.toString(),
+        type: (e.response?.data as Map).keys.first.toString().toUpperCase(),
         exception: 'create_account_error',
       ));
     }
@@ -103,7 +106,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         message: LoginError().errorMessage(
             code: FirebaseError.fromJson(e.response?.data).error?.message ??
                 'erro'),
-        type: 'runtimeType.toString()',
+        type: (e.response?.data as Map).keys.first.toString().toUpperCase(),
         exception: 'login_error',
       ));
     }
@@ -136,7 +139,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       return Left(Failure(
         status: e.response?.statusCode ?? 0,
         message: e.response?.statusMessage ?? 'erro',
-        type: runtimeType.toString(),
+        type: (e.response?.data as Map).keys.first.toString().toUpperCase(),
         exception: 'update_token_error',
       ));
     }
@@ -165,7 +168,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       return Left(Failure(
         status: e.response?.statusCode ?? 0,
         message: e.response?.statusMessage ?? 'erro',
-        type: runtimeType.toString(),
+        type: (e.response?.data as Map).keys.first.toString().toUpperCase(),
         exception: 'get_user_info_error',
       ));
     }

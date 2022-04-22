@@ -63,6 +63,15 @@ class LocalAuthMessages {
           default:
             return 'Tentativas bloqueadas permanentemente devido ao número de tentativas erradas. Utilize outro fator de seguranca (PIN/Padrão/Senha).';
         }
+      case 'invalidCode':
+        switch (_locale) {
+          case 'en':
+            return 'Invalid try. Please, try again.';
+          case 'es':
+            return '';
+          default:
+            return 'Tentativa inválida. Por favor, tente novamente.';
+        }
       default:
         return 'Erro ao acessar os recursos de biometria. Tente novamente mais tarde.';
     }
