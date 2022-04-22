@@ -19,19 +19,14 @@ class LocalAuthImpl implements LocalAuth {
       if (authenticate) {
         return Right(Success(true));
       } else {
-        return Left(Failure(
-          status: 0,
-          message: 'nao authenticado',
-          type: 'type',
-          exception: 'exception',
-        ));
+        throw PlatformException(code: 'invalidCode');
       }
     } on PlatformException catch (e) {
       return Left(Failure(
         status: 0,
         message: LocalAuthMessages().authenticateErrorMessage(code: e.code),
         type: 'authenticate_error',
-        exception: e,
+        exception: 'authenticate_error',
       ));
     }
   }
@@ -52,7 +47,7 @@ class LocalAuthImpl implements LocalAuth {
         status: 0,
         message: e.message ?? 'erro',
         type: 'get_biometric_error',
-        exception: e,
+        exception: 'get_biometric_error',
       ));
     }
   }
@@ -67,14 +62,21 @@ class LocalAuthImpl implements LocalAuth {
       if (_isSupported) {
         return Right(Success(true));
       } else {
-        throw PlatformException;
+        return Left(
+          Failure(
+              status: 0,
+              message:
+                  'Seu dispositivo não possui biometria ou não está configurado. Acesse as configurações para ativar.',
+              type: 'Biometria',
+              exception: 'biometrics_error'),
+        );
       }
     } on PlatformException catch (e) {
       return Left(Failure(
         status: 0,
         message: e.message ?? 'erro',
         type: 'support_biometric_error',
-        exception: e,
+        exception: 'support_biometric_error',
       ));
     }
   }

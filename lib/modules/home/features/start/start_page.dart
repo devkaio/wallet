@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:mobx/mobx.dart';
+import 'package:system_settings/system_settings.dart';
 import 'package:wallet/l10n/i18n.dart';
 import 'package:wallet/modules/home/features/start/start_store.dart';
 
@@ -22,12 +23,15 @@ class StartPage extends StatefulWidget {
   State<StartPage> createState() => _StartPageState();
 }
 
-class _StartPageState extends ModularState<StartPage, StartStore> {
+class _StartPageState extends ModularState<StartPage, StartStore>
+    with WidgetsBindingObserver {
   final LocalAuthentication _localAuth = LocalAuthentication();
 
   ReactionDisposer? _disposer;
   @override
   void initState() {
+    WidgetsBinding.instance?.addObserver(this);
+
     _disposer = reaction((_) => store.state, (StartState s) {
       s.when(
         loading: () => showDialog(
@@ -36,12 +40,50 @@ class _StartPageState extends ModularState<StartPage, StartStore> {
           builder: (_) => const Center(child: CircularProgressIndicator()),
         ),
         failure: () {
-          Navigator.pop(context);
           final Failure? error = (s as StartStateFailure).error;
-          //TODO: implements StartStateFailure
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(error?.type ?? 'erro'),
+              content: Text(error?.message ?? 'erro'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    if (error?.exception == 'biometrics_error') {
+                      Navigator.pop(context);
+                      SystemSettings.security();
+                    } else {
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: const Text('ok'),
+                ),
+              ],
+            ),
+          );
         },
         success: () {
           //TODO: implements StartStateSuccess
+        },
+        sessionExpired: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return CustomDialog(
+                title: 'Sessão Expirada',
+                content:
+                    'O tempo da sessão acabou. Por favor, realize o login novamente?',
+                buttons: [
+                  PrimaryButton(
+                    onPressed: () {
+                      Modular.to.popUntil(ModalRoute.withName('/initial'));
+                    },
+                    text: 'ok',
+                  )
+                ],
+              );
+            },
+          );
         },
         empty: () {
           showDialog(
@@ -86,8 +128,18 @@ class _StartPageState extends ModularState<StartPage, StartStore> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance?.removeObserver(this);
+
     if (_disposer != null) _disposer!();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    store.checkAppState(
+      state.name,
+      auth: _localAuth,
+    );
   }
 
   @override

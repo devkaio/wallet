@@ -35,7 +35,7 @@ class Error {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (errors != null) {
       data['errors'] = errors!.map((v) => v.toJson()).toList();
     }
