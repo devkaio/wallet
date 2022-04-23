@@ -60,6 +60,7 @@ dependencies:
   flutter_secure_storage: ^5.0.2
   http: ^0.13.4
   system_settings: ^2.1.0
+  firebase_crashlytics: ^2.6.3
 
 dev_dependencies:
   flutter_test:

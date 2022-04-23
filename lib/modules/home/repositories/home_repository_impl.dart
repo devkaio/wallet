@@ -4,6 +4,8 @@ import 'package:wallet/modules/home/repositories/home_repository.dart';
 import 'package:wallet/shared/utils/failure.dart';
 import 'package:wallet/shared/utils/success.dart';
 
+import '../../../shared/services/firebase/crashlytics/crashlytics_service.dart';
+
 class HomeRepositoryImpl implements HomeRepository {
   @override
   Future<Either<Failure, Success<bool>>> getUserData() {
@@ -25,7 +27,8 @@ class HomeRepositoryImpl implements HomeRepository {
             status: 0,
             type: 'error'));
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ErrorReport.externalFailureError(e, stackTrace, 'get_token');
       return Left(Failure(
           exception: e, message: 'erro id token', status: 0, type: 'error'));
     }
@@ -36,7 +39,8 @@ class HomeRepositoryImpl implements HomeRepository {
     try {
       await FirebaseAuth.instance.signOut();
       return Right(Success(true));
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseException catch (e, stackTrace) {
+      ErrorReport.externalFailureError(e, stackTrace, 'sign_out');
       return Left(Failure(
         status: 0,
         message: e.message ?? 'erro',
