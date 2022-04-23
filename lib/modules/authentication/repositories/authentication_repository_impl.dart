@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:wallet/modules/authentication/features/create_account/utils/create_account_error.dart';
 import 'package:wallet/modules/authentication/features/login/utils/login_error.dart';
 import 'package:wallet/shared/models/firebase_error.dart';
+import 'package:wallet/shared/services/firebase/crashlytics/crashlytics_service.dart';
 
 import '../../../firebase_options.dart';
 import '../../../shared/models/models.dart';
@@ -24,7 +25,8 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         options: DefaultFirebaseOptions.currentPlatform,
       );
       return Right(Success(true));
-    } on DioError catch (e) {
+    } on DioError catch (e, stackTrace) {
+      ErrorReport.externalFailureError(e, stackTrace, 'authenticate');
       return Left(
         Failure(
           status: FirebaseError.fromJson(e.response?.data).error?.code ?? 0,
@@ -63,7 +65,8 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
           exception: 'Error',
         ));
       }
-    } on DioError catch (e) {
+    } on DioError catch (e, stackTrace) {
+      ErrorReport.externalFailureError(e, stackTrace, 'create_account');
       return Left(Failure(
         status: FirebaseError.fromJson(e.response?.data).error?.code ?? 0,
         message: CreateAccountError().errorMessage(
@@ -100,7 +103,8 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
           type: 'Error',
         ));
       }
-    } on DioError catch (e) {
+    } on DioError catch (e, stackTrace) {
+      ErrorReport.externalFailureError(e, stackTrace, 'login');
       return Left(Failure(
         status: FirebaseError.fromJson(e.response?.data).error?.code ?? 0,
         message: LoginError().errorMessage(
@@ -135,7 +139,8 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
           type: 'Error',
         ));
       }
-    } on DioError catch (e) {
+    } on DioError catch (e, stackTrace) {
+      ErrorReport.externalFailureError(e, stackTrace, 'update_token');
       return Left(Failure(
         status: e.response?.statusCode ?? 0,
         message: e.response?.statusMessage ?? 'erro',
@@ -164,7 +169,8 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
           type: 'Error',
         ));
       }
-    } on DioError catch (e) {
+    } on DioError catch (e, stackTrace) {
+      ErrorReport.externalFailureError(e, stackTrace, 'get_user_data');
       return Left(Failure(
         status: e.response?.statusCode ?? 0,
         message: e.response?.statusMessage ?? 'erro',
