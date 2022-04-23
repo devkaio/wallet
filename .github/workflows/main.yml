@@ -34,6 +34,6 @@ jobs:
         with:
           flutter-version: '2.10.0'
           channel: 'stable'
-      - run: cd ./wallet && flutter pub get
-      - run: cd ./wallet && flutter analyze
-      - run: cd ./wallet && flutter test
+      - run: cd ./iwfpapp && flutter pub get
+      - run: cd ./iwfpapp && flutter analyze
+      - run: cd ./iwfpapp && flutter test
