@@ -30,7 +30,7 @@ class _StartPageState extends ModularState<StartPage, StartStore>
   ReactionDisposer? _disposer;
   @override
   void initState() {
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
 
     _disposer = reaction((_) => store.state, (StartState s) {
       s.when(
@@ -128,7 +128,7 @@ class _StartPageState extends ModularState<StartPage, StartStore>
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
 
     if (_disposer != null) _disposer!();
     super.dispose();

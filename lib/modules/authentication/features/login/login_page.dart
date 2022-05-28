@@ -72,7 +72,7 @@ class _LoginPageState extends ModularState<LoginPage, LoginStore> {
         orElse: () {},
       );
     });
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       store.checkBiometrics();
     });
     super.initState();
