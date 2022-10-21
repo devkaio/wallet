@@ -48,7 +48,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCdqtxt_2CS7z9oaxagdV-nmujVIQ5l6sk',
+    apiKey: 'AIzaSyDEAP96sO9GRWCSnN0ZnpwXxRrxZ1dYoNk',
     appId: '1:249508352854:android:a6536c0b2f7515158a3cf7',
     messagingSenderId: '249508352854',
     projectId: 'wallet-a72b4',
